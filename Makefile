@@ -1,12 +1,13 @@
-#CFLAGS = -Wall -Werror -Wextra -Wpadded -g -Weverything -fcolor-diagnostics -fsanitize=address
-CFLAGS=
+CFLAGS = -Wall -Werror -Wextra -Wpadded -fcolor-diagnostics
+#CFLAGS=
 
 ifeq ($(HOSTTYPE),)
 HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
 CC=clang
-EXEC = libft_malloc_$(HOSTTYPE).so
+#EXEC = libft_malloc_$(HOSTTYPE).so
+EXEC = a.out
 
 ##### SOURCES #####
 
@@ -31,7 +32,8 @@ INCLUDES = -I $(INCL_DIR)/$(INCL_FILES)
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(CFLAGS) -shared -o $(EXEC) $(OBJS) $(INCLUDES)
+	$(CC) $(CFLAGS) -o $(EXEC) $(OBJS) main.c $(INCLUDES)
+#	$(CC) $(CFLAGS) -shared -o $(EXEC) $(OBJS) $(INCLUDES)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(OBJ_DIR)

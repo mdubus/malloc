@@ -12,14 +12,15 @@ EXEC = a.out
 ##### SOURCES #####
 
 SRC_DIR = src
-SRC_FILES = malloc.c
-SRCS = $(SRC_DIR)/$(SRC_FILES)
+SRC_FILES =	malloc.c search_best_fit.c
+
+SRCS = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 
 ##### OBJECTS #####
 
 OBJ_DIR = obj
 OBJ_FILES = $(SRC_FILES:.c=.o)
-OBJS = $(OBJ_DIR)/$(OBJ_FILES)
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
 
 ##### INCLUDES #####
 
@@ -32,17 +33,19 @@ INCLUDES = -I $(INCL_DIR)/$(INCL_FILES)
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(CFLAGS) -o $(EXEC) $(OBJS) main.c $(INCLUDES)
+	@$(CC) $(CFLAGS) -o $(EXEC) $(OBJS) main.c $(INCLUDES)
 #	$(CC) $(CFLAGS) -shared -o $(EXEC) $(OBJS) $(INCLUDES)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $^ -o $@
+	@mkdir -p $(OBJ_DIR)
+	@$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJ_DIR)
 
 fclean: clean
-	rm $(EXEC)
+	@rm $(EXEC)
 
 re: fclean all
+
+.PHONY: all clean fclean re

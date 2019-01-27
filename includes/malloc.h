@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 void	*ft_malloc(size_t size);
 void	ft_free(void *ptr);
 
@@ -34,5 +35,10 @@ struct s_arena {
 	t_block	tiny;
 	t_block small;
 };
+
+t_arena arena;
+
+t_header	*search_best_fit(t_header *list, size_t size);
+void		print_list(t_header *list);
 
 #endif

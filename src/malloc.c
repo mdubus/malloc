@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 16:53:57 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/27 16:54:01 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/01/27 17:43:21 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void	*get_new_arena(size_t size)
 
 void	split_block(t_block *arena, t_header *best_fit, size_t size)
 {
-
 	// padding
 
 	// ON LINK LE NOUVEAU MORCEAU DISPO DANS FREE
@@ -47,8 +46,7 @@ void	split_block(t_block *arena, t_header *best_fit, size_t size)
 	}
 	else
 	{
-		// Si pas de prev, faire pointer le debut de la liste chainee sur lui
-		arena->free = best_fit + size;
+		arena->free = (void*)best_fit + size;
 		arena->free->prev = NULL;
 	}
 	if (best_fit->next != NULL)
@@ -59,8 +57,11 @@ void	split_block(t_block *arena, t_header *best_fit, size_t size)
 	else
 	{
 		(best_fit + size)->next = NULL;
-		(best_fit + size)->size = best_fit->size - size;
 	}
+	printf("free available space : %zu\n", best_fit->size - size - sizeof(t_header));
+	printf("%p\n", (void*)best_fit + size);
+	(best_fit + size)->size = best_fit->size - size - sizeof(t_header);
+
 
 	// ON LINK LE NOUVEAU MAILLON PRIS DANS IN USE
 	// On le met tout a la fin pour le moment. Penser a les trier par adresse
@@ -114,6 +115,7 @@ void	*ft_malloc(size_t size)
 		else
 		{
 			split_block(&arena.tiny, best_fit, size + sizeof(t_header));
+			printf("%zu\n\n", arena.tiny.free->size);
 			return best_fit + sizeof(t_header);
 		}//	return (arena.tiny.free + sizeof(t_block));
 	}

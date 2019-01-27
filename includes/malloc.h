@@ -3,6 +3,7 @@
 
 #define MMAP_PROT (PROT_READ | PROT_WRITE)
 #define MMAP_FLAGS (MAP_ANON | MAP_PRIVATE)
+#define PADDING		16
 
 // On mac, 2^21 is the max size for tiny arenas.
 // 2^21 / 4096 (pagesize) = 512
@@ -18,8 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-
-
 
 typedef struct	s_arena t_arena;
 typedef struct	s_block t_block;

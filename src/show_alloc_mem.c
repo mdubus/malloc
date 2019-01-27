@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 14:34:46 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/27 16:55:39 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/01/27 17:09:51 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,5 +62,10 @@ void	show_alloc_mem(void)
 	{
 		ft_putstr("\nSMALL : ");
 		print_list(arena.small.inUse);
+	}
+	if (arena.tiny.free != NULL)
+	{
+		ft_putstr("\nTINY FREE : ");
+		print_list(arena.tiny.free);
 	}
 }

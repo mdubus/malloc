@@ -1,5 +1,16 @@
-#include "../includes/malloc.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   malloc.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/01/27 16:53:57 by mdubus            #+#    #+#             */
+/*   Updated: 2019/01/27 16:54:01 by mdubus           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../includes/malloc.h"
 
 void	init_new_block(t_header *arena, size_t size)
 {
@@ -21,6 +32,7 @@ void	*get_new_arena(size_t size)
 
 void	split_block(t_block *arena, t_header *best_fit, size_t size)
 {
+
 	// padding
 
 	// ON LINK LE NOUVEAU MORCEAU DISPO DANS FREE
@@ -45,8 +57,10 @@ void	split_block(t_block *arena, t_header *best_fit, size_t size)
 		best_fit->next->prev = (best_fit + size);
 	}
 	else
+	{
 		(best_fit + size)->next = NULL;
-	(best_fit + size)->size = best_fit->size - size;
+		(best_fit + size)->size = best_fit->size - size;
+	}
 
 	// ON LINK LE NOUVEAU MAILLON PRIS DANS IN USE
 	// On le met tout a la fin pour le moment. Penser a les trier par adresse
@@ -57,24 +71,14 @@ void	split_block(t_block *arena, t_header *best_fit, size_t size)
 		arena->inUse->next = best_fit;
 		arena->inUse->next->prev = arena->inUse;
 		arena->inUse->next->next = NULL;
-		arena->inUse->next->size = size;
+		arena->inUse->next->size = size - sizeof(t_header);
 	}
 	else
 	{
 		arena->inUse = best_fit;
-		arena->inUse->size = size;
+		arena->inUse->size = size - sizeof(t_header);
 		arena->inUse->next = NULL;
 		arena->inUse->prev = NULL;
-	}
-}
-
-void	print_list(t_header	*list)
-{
-	while (list != NULL)
-	{
-		printf("%zu\n", list->size);
-		printf("%p\n", list);
-		list = list->next;
 	}
 }
 
@@ -84,13 +88,19 @@ void	*ft_malloc(size_t size)
 	size_t		max_small;
 	t_header	*best_fit;
 
+	if (size <= 0)
+		return NULL;
 	best_fit = NULL;
 	max_tiny = (size_t)MAX_TINY * getpagesize();
 	max_small = (size_t)MAX_SMALL * getpagesize();
+
+
 	if ((void*)arena.tiny.free == NULL)
 		arena.tiny.free = get_new_arena(max_tiny);
 	if ((void*)arena.small.free == NULL)
 		arena.small.free = get_new_arena(max_small);
+	if (arena.tiny.free == NULL || arena.small.free == NULL)
+		return NULL;
 
 	if (size + sizeof(t_header) <= max_tiny)
 	{

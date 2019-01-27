@@ -3,14 +3,12 @@
 
 int	main(void)
 {
-	char	*str = ft_malloc(7);
+	char	*str = ft_malloc(1);
 	(void)str;
+
 	char	*str2 = ft_malloc(30);
 	(void)str2;
-	printf("********** FREE LIST **********\n");
-	print_list(arena.tiny.free);
-	printf("********** IN USE LIST **********\n");
-	print_list(arena.tiny.inUse);
+	show_alloc_mem();
 
 	return 0;
 }

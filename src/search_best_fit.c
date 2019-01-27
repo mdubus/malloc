@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 10:16:34 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/27 10:17:11 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/01/27 16:54:35 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,10 @@ t_header	*search_best_fit(t_header *list, size_t size)
 	best_ptr = NULL;
 	while (list != NULL)
 	{
-		if ((best_ptr == NULL || list->size < best_ptr->size) && list->size >= size)
+		if ((best_ptr == NULL || list->size < best_ptr->size) &&
+				list->size >= size)
 			best_ptr = list;
 		list = list->next;
 	}
-	return best_ptr;
+	return (best_ptr);
 }

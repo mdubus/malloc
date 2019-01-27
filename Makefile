@@ -12,7 +12,7 @@ EXEC = a.out
 ##### SOURCES #####
 
 SRC_DIR = src
-SRC_FILES =	malloc.c search_best_fit.c
+SRC_FILES =	malloc.c search_best_fit.c show_alloc_mem.c ft_print_address.c
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 

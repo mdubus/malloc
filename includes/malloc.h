@@ -13,6 +13,8 @@
 // 2^24 / 4096 (pagesize) = 4096
 #define MAX_SMALL	4096
 
+#define padding		16
+
 #include <stddef.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -30,14 +32,11 @@ struct s_header {
 	t_header	*next;
 };
 
-struct s_block {
-	t_header	*free;
-	t_header	*inUse;
-};
-
 struct s_arena {
-	t_block	tiny;
-	t_block small;
+	t_header	*tiny;
+	t_header	*small;
+	t_header	*large;
+	t_header	*used;
 };
 
 t_arena arena;
@@ -47,22 +46,28 @@ char	*ft_strrev(char	*str);
 char	*ft_utoa_base_r(char *buf, unsigned long long n, unsigned base);
 void	ft_print_address(uintptr_t ptr);
 
-/* malloc */
-
+/* get new arena */
 void	init_new_block(t_header *arena, size_t size);
 void	*get_new_arena(size_t size);
-void	split_block(t_block *arena, t_header *best_fit, size_t size);
+
+/* malloc */
+
+void	split_block(t_header **arena, t_header *best_fit, size_t size);
 void	*ft_malloc(size_t size);
 
 /* search_best_fit */
 
 t_header	*search_best_fit(t_header *list, size_t size);
 
-/* show_alloc_mem */
-
+/* ft_putstr */
 size_t	ft_strlen(const char *s);
 void	ft_putstr(char *str);
-void	print_list(t_header *list);
+
+/* show_alloc_mem */
+
 void	show_alloc_mem();
+void	print_padding(t_header	*list, size_t *total_padding);
+void	print_size(t_header *list);
+void	print_header(t_header *list);
 
 #endif

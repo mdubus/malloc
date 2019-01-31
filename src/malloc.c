@@ -6,80 +6,64 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 16:53:57 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/27 17:43:21 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/01/31 16:28:54 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/malloc.h"
 
-void	init_new_block(t_header *arena, size_t size)
+void	split_block(t_header **current_arena, t_header *best_fit, size_t size)
 {
-	arena->next = NULL;
-	arena->prev = NULL;
-	arena->size = size;
-}
+	t_header	*rest;
+	t_header	*current_used;
+	size_t		aligned_size;
 
-void	*get_new_arena(size_t size)
-{
-	void	*ptr;
+	aligned_size = size;
+	if (aligned_size % sizeof(long) != 0)
+		aligned_size = aligned_size + (sizeof(long) - aligned_size % sizeof(long));
 
-	ptr = mmap(0, size, MMAP_PROT, MMAP_FLAGS, -1, 0);
-	if (ptr == MAP_FAILED)
-		return NULL;
-	init_new_block(ptr, size);
-	return ptr;
-}
-
-void	split_block(t_block *arena, t_header *best_fit, size_t size)
-{
-	// padding
-
-	// ON LINK LE NOUVEAU MORCEAU DISPO DANS FREE
+	// EXTRAIT LE MORCEAU DE PRIS ET ON LINK LES FREE ENTRE EUX
 	// A-t-on la place dans le morceau restant pour stocker un header ?
 	// Si oui, on cree un nouveau maillon (ci-dessous)
 	// Si non, on defragmente si on peut.
-	// Si pas de defrag, on le laisse avec le maillon inUse
-	if (best_fit->prev != NULL)
-	{
-		best_fit->prev->next = best_fit + size;
-		(best_fit + size)->prev = best_fit->prev;
-	}
+	// Si pas de defrag, on le laisse avec le maillon used
+	rest = (void*)best_fit + aligned_size;
+	if (best_fit->prev == NULL)
+		rest->prev = NULL;
 	else
 	{
-		arena->free = (void*)best_fit + size;
-		arena->free->prev = NULL;
+		best_fit->prev->next = rest;
+		rest->prev = best_fit->prev;
 	}
-	if (best_fit->next != NULL)
-	{
-		(best_fit + size)->next = best_fit->next;
-		best_fit->next->prev = (best_fit + size);
-	}
+	if (best_fit->next == NULL)
+		rest->next = NULL;
 	else
 	{
-		(best_fit + size)->next = NULL;
+		rest->next = best_fit->next;
+		best_fit->next->prev = rest;
 	}
-	printf("free available space : %zu\n", best_fit->size - size - sizeof(t_header));
-	printf("%p\n", (void*)best_fit + size);
-	(best_fit + size)->size = best_fit->size - size - sizeof(t_header);
+	rest->size = best_fit->size - size;
+	*current_arena = rest;
 
 
-	// ON LINK LE NOUVEAU MAILLON PRIS DANS IN USE
+	// ON LINK LE NOUVEAU MAILLON PRIS DANS USED
 	// On le met tout a la fin pour le moment. Penser a les trier par adresse
-	while (arena->inUse && arena->inUse->next != NULL)
-		arena->inUse = arena->inUse->next;
-	if (arena->inUse != NULL)
+	current_used = arena.used;
+	while (current_used && current_used->next != NULL)
+		current_used = current_used->next;
+	if (current_used == NULL)
 	{
-		arena->inUse->next = best_fit;
-		arena->inUse->next->prev = arena->inUse;
-		arena->inUse->next->next = NULL;
-		arena->inUse->next->size = size - sizeof(t_header);
+		arena.used = best_fit;
+		arena.used->size = size - sizeof(t_header);
+		arena.used->next = NULL;
+		arena.used->prev = NULL;
 	}
 	else
 	{
-		arena->inUse = best_fit;
-		arena->inUse->size = size - sizeof(t_header);
-		arena->inUse->next = NULL;
-		arena->inUse->prev = NULL;
+		current_used->next = best_fit;
+		current_used->next->prev = current_used;
+		current_used->next->next = NULL;
+		current_used->next->size = size - sizeof(t_header);
 	}
 }
 
@@ -95,44 +79,27 @@ void	*ft_malloc(size_t size)
 	max_tiny = (size_t)MAX_TINY * getpagesize();
 	max_small = (size_t)MAX_SMALL * getpagesize();
 
-
-	if ((void*)arena.tiny.free == NULL)
-		arena.tiny.free = get_new_arena(max_tiny);
-	if ((void*)arena.small.free == NULL)
-		arena.small.free = get_new_arena(max_small);
-	if (arena.tiny.free == NULL || arena.small.free == NULL)
+	if ((void*)arena.tiny == NULL)
+		arena.tiny = get_new_arena(max_tiny);
+	if ((void*)arena.small == NULL)
+		arena.small = get_new_arena(max_small);
+	if (arena.tiny == NULL || arena.small == NULL)
 		return NULL;
 
 	if (size + sizeof(t_header) <= max_tiny)
 	{
-		best_fit = search_best_fit(arena.tiny.free, size + sizeof(t_header));
+		best_fit = search_best_fit(arena.tiny, size + sizeof(t_header));
 		if (best_fit == NULL)
 		{
-			// Get new arena and pu it in the free list, ordered by addresses
+			// Get new arena and put it in the free list, ordered by addresses
 			best_fit = get_new_arena(max_tiny);
 			return best_fit;
 		}
 		else
 		{
 			split_block(&arena.tiny, best_fit, size + sizeof(t_header));
-			printf("%zu\n\n", arena.tiny.free->size);
-			return best_fit + sizeof(t_header);
-		}//	return (arena.tiny.free + sizeof(t_block));
-	}
-	else if (size + sizeof(t_header) <= max_small)
-	{
-		best_fit = search_best_fit(arena.small.free, size + sizeof(t_header));
-		if (best_fit == NULL)
-		{
-			best_fit = get_new_arena(max_small);
-			return best_fit;
-		}
-		else
-		{
-			split_block(&arena.small, best_fit, size + sizeof(t_header));
 			return best_fit + sizeof(t_header);
 		}
-		//	return (arena.small.free + sizeof(t_block));
 	}
-	return NULL;
+	return (NULL);
 }

@@ -1,33 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   search_best_fit.c                                  :+:      :+:    :+:   */
+/*   get_new_arena.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/27 10:16:34 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/31 16:26:47 by mdubus           ###   ########.fr       */
+/*   Created: 2019/01/31 14:09:06 by mdubus            #+#    #+#             */
+/*   Updated: 2019/01/31 16:25:58 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/malloc.h"
 
-t_header	*search_best_fit(t_header *list, size_t size)
+void	init_new_block(t_header *arena, size_t size)
 {
-	t_header	*best_ptr;
-	size_t		aligned_size;
+	arena->next = NULL;
+	arena->prev = NULL;
+	arena->size = size - sizeof(t_header);
+}
 
-	best_ptr = NULL;
-	aligned_size = size;
-	if (aligned_size % sizeof(long) != 0)
-		aligned_size = aligned_size + (sizeof(long) -
-				aligned_size % sizeof(long));
-	while (list != NULL)
-	{
-		if ((best_ptr == NULL || list->size < best_ptr->size) &&
-				list->size >= aligned_size)
-			best_ptr = list;
-		list = list->next;
-	}
-	return (best_ptr);
+void	*get_new_arena(size_t size)
+{
+	void	*ptr;
+
+	ptr = mmap(0, size, MMAP_PROT, MMAP_FLAGS, -1, 0);
+	if (ptr == MAP_FAILED)
+		return (NULL);
+	init_new_block(ptr, size);
+	return (ptr);
 }

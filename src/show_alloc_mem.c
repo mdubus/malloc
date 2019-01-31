@@ -6,66 +6,83 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 14:34:46 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/27 17:09:51 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/01/31 16:27:37 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/malloc.h"
 
-size_t	ft_strlen(const char *s)
+void	print_header(t_header *list)
 {
-	size_t i;
+	void	*begin_address;
+	void	*end_address;
 
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
+	begin_address = list;
+	end_address = (void*)list + sizeof(t_header);
+	ft_print_address((uintptr_t)begin_address);
+	ft_putstr("\x1B[35m - header - \x1B[0m");
+	ft_print_address((uintptr_t)end_address);
 }
 
-void	ft_putstr(char *str)
+void	print_size(t_header *list)
 {
-	write(1, str, ft_strlen(str));
-}
-
-void	print_list(t_header *list)
-{
+	void	*end_address;
 	char	size[21];
 
-	ft_print_address((uintptr_t)list);
-	write(1, "\n\n", 2);
-	while (list != NULL)
-	{
-		ft_print_address((uintptr_t)list);
-		ft_putstr("\x1B[35m - header - \x1B[0m");
-		ft_print_address((uintptr_t)list + sizeof(t_header));
-		ft_putstr("\x1B[36m - size : ");
-		ft_utoa_base_r(size, list->size, 10);
-		ft_putstr(size);
-		ft_putstr(" - \x1B[0m");
-		ft_print_address((uintptr_t)list + sizeof(t_header) + list->size);
-		ft_putstr("\x1B[94m - padding : ");
-		ft_putstr(" - \x1B[0m");
-		write(1, "\n", 1);
-		list = list->next;
-	}
-	write(1, "\n", 1);
+	end_address = (void*)list + sizeof(t_header) + list->size;
+	ft_putstr("\x1B[36m - size : ");
+	ft_utoa_base_r(size, list->size, 10);
+	ft_putstr(size);
+	ft_putstr(" - \x1B[0m");
+	ft_print_address((uintptr_t)end_address);
+}
+
+void	print_padding(t_header *list, size_t *total_padding)
+{
+	size_t	aligned_size;
+	void	*end_address;
+	char	size[21];
+
+	aligned_size = list->size;
+	if (aligned_size % sizeof(long) != 0)
+		aligned_size = aligned_size + (sizeof(long) - aligned_size % sizeof(long));
+	end_address = (void*)list + sizeof(t_header) + aligned_size;
+	ft_putstr("\x1B[94m - padding : ");
+	ft_utoa_base_r(size, (aligned_size - list->size), 10);
+	ft_putstr(size);
+	ft_putstr(" - \x1B[0m");
+	ft_print_address((uintptr_t)end_address);
+	ft_putstr("\n");
+	*total_padding += (aligned_size - list->size);
 }
 
 void	show_alloc_mem(void)
 {
-	if (arena.tiny.inUse != NULL)
+	size_t	total_size;
+	size_t	total_padding;
+
+	total_size = 0;
+	total_padding = 0;
+	ft_putstr("List in use : \n");
+	while (arena.used != NULL)
 	{
-		ft_putstr("\nTINY : ");
-		print_list(arena.tiny.inUse);
+		print_header(arena.used);
+		print_size(arena.used);
+		print_padding(arena.used, &total_padding);
+		total_size += arena.used->size + sizeof(t_header);
+		arena.used = arena.used->next;
 	}
-	if (arena.small.inUse != NULL)
+	printf("\nTotal used : %zu (+ %zu padding)\n", total_size, total_padding);
+
+	total_padding = 0;
+	ft_putstr("\nTiny free list : \n");
+	while (arena.tiny != NULL)
 	{
-		ft_putstr("\nSMALL : ");
-		print_list(arena.small.inUse);
+		print_header(arena.tiny);
+		print_size(arena.tiny);
+		print_padding(arena.tiny, &total_padding);
+		total_size += arena.tiny->size + sizeof(t_header);
+		arena.tiny = arena.tiny->next;
 	}
-	if (arena.tiny.free != NULL)
-	{
-		ft_putstr("\nTINY FREE : ");
-		print_list(arena.tiny.free);
-	}
+	printf("\nTotal reserved : %zu\n", total_size);
 }

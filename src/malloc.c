@@ -6,65 +6,86 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 16:53:57 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/31 16:28:54 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/02/01 11:53:00 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/malloc.h"
 
-void	split_block(t_header **current_arena, t_header *best_fit, size_t size)
+void	put_block_in_list(t_header **tmp, t_header **next_block)
+{
+	if ((*tmp)->next == NULL)
+	{
+		(*tmp)->next = *next_block;
+		(*tmp)->next->next = NULL;
+	}
+	else
+	{
+		(*next_block)->next = (*tmp)->next;
+		(*tmp)->next = *next_block;
+	}
+}
+
+void	put_rest_in_free_list(t_header *best_fit, size_t size, t_header **current_arena)
 {
 	t_header	*rest;
-	t_header	*current_used;
+	t_header	*tmp;
 	size_t		aligned_size;
 
+	tmp = *current_arena;
 	aligned_size = size;
 	if (aligned_size % sizeof(long) != 0)
 		aligned_size = aligned_size + (sizeof(long) - aligned_size % sizeof(long));
+	rest = (void*)best_fit + aligned_size;
+	rest->size = best_fit->size - size;
 
+	if ((*current_arena)->next == NULL)
+	{
+		*current_arena = rest;
+		(*current_arena)->next = NULL;
+	}
+	else
+	{
+		while (tmp && tmp->next != NULL && rest < tmp->next)
+			tmp = tmp->next;
+		put_block_in_list(&tmp, &rest);
+	}
+}
+
+void	put_block_in_used_list(t_header *best_fit, size_t size)
+{
+	size_t		aligned_size;
+	t_header	*tmp;
+
+	aligned_size = size;
+	tmp = (void*)arena.used;
+	if (aligned_size % sizeof(long) != 0)
+		aligned_size = aligned_size + (sizeof(long) - aligned_size % sizeof(long));
+	best_fit->size = size - sizeof(t_header);
+
+	if (arena.used == NULL)
+	{
+		arena.used = best_fit;
+		arena.used->next = NULL;
+	}
+	else
+	{
+		while (tmp && tmp->next != NULL && best_fit > tmp->next)
+			tmp = tmp->next;
+		put_block_in_list(&tmp, &best_fit);
+	}
+}
+
+void	split_block(t_header **current_arena, t_header *best_fit, size_t size)
+{
 	// EXTRAIT LE MORCEAU DE PRIS ET ON LINK LES FREE ENTRE EUX
 	// A-t-on la place dans le morceau restant pour stocker un header ?
 	// Si oui, on cree un nouveau maillon (ci-dessous)
 	// Si non, on defragmente si on peut.
 	// Si pas de defrag, on le laisse avec le maillon used
-	rest = (void*)best_fit + aligned_size;
-	if (best_fit->prev == NULL)
-		rest->prev = NULL;
-	else
-	{
-		best_fit->prev->next = rest;
-		rest->prev = best_fit->prev;
-	}
-	if (best_fit->next == NULL)
-		rest->next = NULL;
-	else
-	{
-		rest->next = best_fit->next;
-		best_fit->next->prev = rest;
-	}
-	rest->size = best_fit->size - size;
-	*current_arena = rest;
 
-
-	// ON LINK LE NOUVEAU MAILLON PRIS DANS USED
-	// On le met tout a la fin pour le moment. Penser a les trier par adresse
-	current_used = arena.used;
-	while (current_used && current_used->next != NULL)
-		current_used = current_used->next;
-	if (current_used == NULL)
-	{
-		arena.used = best_fit;
-		arena.used->size = size - sizeof(t_header);
-		arena.used->next = NULL;
-		arena.used->prev = NULL;
-	}
-	else
-	{
-		current_used->next = best_fit;
-		current_used->next->prev = current_used;
-		current_used->next->next = NULL;
-		current_used->next->size = size - sizeof(t_header);
-	}
+	put_rest_in_free_list(best_fit, size, current_arena);
+	put_block_in_used_list(best_fit, size);
 }
 
 void	*ft_malloc(size_t size)

@@ -3,7 +3,6 @@
 
 #define MMAP_PROT (PROT_READ | PROT_WRITE)
 #define MMAP_FLAGS (MAP_ANON | MAP_PRIVATE)
-#define PADDING		16
 
 // On mac, 2^21 is the max size for tiny arenas.
 // 2^21 / 4096 (pagesize) = 512
@@ -12,8 +11,6 @@
 // On max, 2^24 is the max size for small arenas.
 // 2^24 / 4096 (pagesize) = 4096
 #define MAX_SMALL	4096
-
-#define padding		16
 
 #include <stddef.h>
 #include <sys/mman.h>
@@ -28,7 +25,6 @@ typedef struct	s_header t_header;
 
 struct s_header {
 	size_t		size;
-	t_header	*prev;
 	t_header	*next;
 };
 

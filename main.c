@@ -4,7 +4,9 @@
 int	main(void)
 {
 	char	*str = ft_malloc(10);
+//	free(str);
 //	(void)str;
+	str = ft_malloc(20);
 	str = ft_malloc(20);
 	str = ft_malloc(26);
 

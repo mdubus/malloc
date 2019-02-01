@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 14:09:06 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/31 16:25:58 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/02/01 09:47:01 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	init_new_block(t_header *arena, size_t size)
 {
 	arena->next = NULL;
-	arena->prev = NULL;
 	arena->size = size - sizeof(t_header);
 }
 

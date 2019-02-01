@@ -37,10 +37,10 @@ struct s_arena {
 
 t_arena arena;
 
-/* ft_print_address */
+/* print_address */
 char	*ft_strrev(char	*str);
 char	*ft_utoa_base_r(char *buf, unsigned long long n, unsigned base);
-void	ft_print_address(uintptr_t ptr);
+void	print_address(uintptr_t ptr);
 
 /* get new arena */
 void	init_new_block(t_header *arena, size_t size);
@@ -65,5 +65,14 @@ void	show_alloc_mem();
 void	print_padding(t_header	*list, size_t *total_padding);
 void	print_size(t_header *list);
 void	print_header(t_header *list);
+
+/* put block in list */
+void	put_block_in_list(t_header **tmp, t_header **next_block);
+
+/* split block */
+void	split_block(t_header **current_arena, t_header *best_fit, size_t size);
+void	put_block_in_used_list(t_header *best_fit, size_t size);
+void	put_rest_in_free_list(t_header *best_fit, size_t size,
+		t_header **current_arena);
 
 #endif

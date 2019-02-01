@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 14:34:46 by mdubus            #+#    #+#             */
-/*   Updated: 2019/02/01 14:22:52 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/02/01 16:32:43 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ void	print_header(t_header *list)
 
 	begin_address = list;
 	end_address = (void*)list + sizeof(t_header);
-	ft_print_address((uintptr_t)begin_address);
+	print_address((uintptr_t)begin_address);
 	ft_putstr("\x1B[35m - header - \x1B[0m");
-	ft_print_address((uintptr_t)end_address);
+	print_address((uintptr_t)end_address);
 }
 
 void	print_size(t_header *list)
@@ -34,7 +34,7 @@ void	print_size(t_header *list)
 	ft_utoa_base_r(size, list->size, 10);
 	ft_putstr(size);
 	ft_putstr(" - \x1B[0m");
-	ft_print_address((uintptr_t)end_address);
+	print_address((uintptr_t)end_address);
 }
 
 void	print_padding(t_header *list, size_t *total_padding)
@@ -51,7 +51,7 @@ void	print_padding(t_header *list, size_t *total_padding)
 	ft_utoa_base_r(size, (aligned_size - list->size), 10);
 	ft_putstr(size);
 	ft_putstr(" - \x1B[0m");
-	ft_print_address((uintptr_t)end_address);
+	print_address((uintptr_t)end_address);
 	ft_putstr("\n");
 	*total_padding += (aligned_size - list->size);
 }
@@ -75,11 +75,10 @@ void	show_alloc_mem(void)
 		total_header += sizeof(t_header);
 		arena.used = arena.used->next;
 	}
-	printf("\nTotal used : \x1B[35m header : %zu \x1B[0m | ", total_header);
+	printf("\nIn use : \x1B[35m header : %zu \x1B[0m | ", total_header);
 	printf("\x1B[36m size : %zu \x1B[0m | ", total_size);
-	printf("\x1B[94m padding : %zu \x1B[0m -> %zu\n\n", total_padding, total_padding + total_size + total_header);
+	printf("\x1B[94m padding : %zu \x1B[0m | Total : %zu\n\n", total_padding, total_padding + total_size + total_header);
 	fflush(stdout);
-
 	ft_putstr("\nTiny free list : \n");
 	while (arena.tiny != NULL)
 	{

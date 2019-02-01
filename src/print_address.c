@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 16:42:53 by mdubus            #+#    #+#             */
-/*   Updated: 2019/01/27 16:53:37 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/02/01 16:28:04 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ char	*ft_utoa_base_r(char *buf, unsigned long long n, unsigned base)
 	return (ft_strrev(buf));
 }
 
-void	ft_print_address(uintptr_t ptr)
+void	print_address(uintptr_t ptr)
 {
 	char	s[19];
 

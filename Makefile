@@ -35,7 +35,7 @@ all: $(EXEC)
 
 $(EXEC): $(OBJS)
 	@$(CC) $(CFLAGS) -o $(EXEC) $(OBJS) main.c $(INCLUDES)
-#	$(CC) $(CFLAGS) -shared -o $(EXEC) $(OBJS) $(INCLUDES)
+#	@$(CC) $(CFLAGS) -shared -o $(EXEC) $(OBJS) $(INCLUDES)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)

@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 16:53:57 by mdubus            #+#    #+#             */
-/*   Updated: 2019/02/01 11:53:00 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/02/01 14:34:00 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	put_block_in_list(t_header **tmp, t_header **next_block)
 {
+	while (*tmp && (*tmp)->next != NULL && *next_block > (*tmp)->next)
+		*tmp = (*tmp)->next;
 	if ((*tmp)->next == NULL)
 	{
 		(*tmp)->next = *next_block;
@@ -37,7 +39,7 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size, t_header **current_a
 	if (aligned_size % sizeof(long) != 0)
 		aligned_size = aligned_size + (sizeof(long) - aligned_size % sizeof(long));
 	rest = (void*)best_fit + aligned_size;
-	rest->size = best_fit->size - size;
+	rest->size = best_fit->size - aligned_size;
 
 	if ((*current_arena)->next == NULL)
 	{
@@ -45,22 +47,14 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size, t_header **current_a
 		(*current_arena)->next = NULL;
 	}
 	else
-	{
-		while (tmp && tmp->next != NULL && rest < tmp->next)
-			tmp = tmp->next;
 		put_block_in_list(&tmp, &rest);
-	}
 }
 
 void	put_block_in_used_list(t_header *best_fit, size_t size)
 {
-	size_t		aligned_size;
 	t_header	*tmp;
 
-	aligned_size = size;
 	tmp = (void*)arena.used;
-	if (aligned_size % sizeof(long) != 0)
-		aligned_size = aligned_size + (sizeof(long) - aligned_size % sizeof(long));
 	best_fit->size = size - sizeof(t_header);
 
 	if (arena.used == NULL)
@@ -69,22 +63,16 @@ void	put_block_in_used_list(t_header *best_fit, size_t size)
 		arena.used->next = NULL;
 	}
 	else
-	{
-		while (tmp && tmp->next != NULL && best_fit > tmp->next)
-			tmp = tmp->next;
 		put_block_in_list(&tmp, &best_fit);
-	}
 }
 
 void	split_block(t_header **current_arena, t_header *best_fit, size_t size)
 {
-	// EXTRAIT LE MORCEAU DE PRIS ET ON LINK LES FREE ENTRE EUX
-	// A-t-on la place dans le morceau restant pour stocker un header ?
-	// Si oui, on cree un nouveau maillon (ci-dessous)
-	// Si non, on defragmente si on peut.
-	// Si pas de defrag, on le laisse avec le maillon used
+	size_t	rest_size;
+	rest_size = best_fit->size - size;
 
-	put_rest_in_free_list(best_fit, size, current_arena);
+	if (rest_size > 0)
+		put_rest_in_free_list(best_fit, size, current_arena);
 	put_block_in_used_list(best_fit, size);
 }
 

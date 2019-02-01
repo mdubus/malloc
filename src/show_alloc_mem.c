@@ -6,7 +6,7 @@
 /*   By: mdubus <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/27 14:34:46 by mdubus            #+#    #+#             */
-/*   Updated: 2019/02/01 09:47:59 by mdubus           ###   ########.fr       */
+/*   Updated: 2019/02/01 14:22:52 by mdubus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,11 @@ void	print_padding(t_header *list, size_t *total_padding)
 
 void	show_alloc_mem(void)
 {
+	size_t	total_header;
 	size_t	total_size;
 	size_t	total_padding;
 
+	total_header = 0;
 	total_size = 0;
 	total_padding = 0;
 	ft_putstr("List in use : \n");
@@ -69,20 +71,24 @@ void	show_alloc_mem(void)
 		print_header(arena.used);
 		print_size(arena.used);
 		print_padding(arena.used, &total_padding);
-		total_size += arena.used->size + sizeof(t_header);
+		total_size += arena.used->size;
+		total_header += sizeof(t_header);
 		arena.used = arena.used->next;
 	}
-	printf("\nTotal used : %zu (+ %zu padding)\n", total_size, total_padding);
+	printf("\nTotal used : \x1B[35m header : %zu \x1B[0m | ", total_header);
+	printf("\x1B[36m size : %zu \x1B[0m | ", total_size);
+	printf("\x1B[94m padding : %zu \x1B[0m -> %zu\n\n", total_padding, total_padding + total_size + total_header);
+	fflush(stdout);
 
-	total_padding = 0;
 	ft_putstr("\nTiny free list : \n");
 	while (arena.tiny != NULL)
 	{
 		print_header(arena.tiny);
 		print_size(arena.tiny);
 		print_padding(arena.tiny, &total_padding);
-		total_size += arena.tiny->size + sizeof(t_header);
+		total_size += arena.tiny->size;
+		total_header += sizeof(t_header);
 		arena.tiny = arena.tiny->next;
 	}
-	printf("\nTotal reserved : %zu\n", total_size);
+	printf("\nTotal reserved : %zu\n", total_header + total_size + total_padding);
 }

@@ -3,15 +3,10 @@
 
 int	main(void)
 {
-	char	*str = ft_malloc(10);
-//	free(str);
+	char	*str = ft_malloc(20);
 //	(void)str;
-	str = ft_malloc(20);
-	str = ft_malloc(20);
-	str = ft_malloc(26);
+	str = ft_malloc(30);
 
-//	char	*str2 = ft_malloc(30);
-//	(void)str2;
 	printf("\nmax tiny : %zu\n\n",(size_t)MAX_TINY * getpagesize());
 	show_alloc_mem();
 

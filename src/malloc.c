@@ -18,6 +18,10 @@ void	*get_mallocked_zone(t_header **current_arena, size_t max_arena_size, size_t
 	t_header	*tmp;
 	best_fit = NULL;
 	tmp = NULL;
+	if (*current_arena == NULL)
+		*current_arena = get_new_arena(max_arena_size);
+	if (*current_arena == NULL)
+		return (NULL);
 	best_fit = search_best_fit(*current_arena, size + sizeof(t_header));
 	if (best_fit == NULL)
 	{
@@ -43,13 +47,6 @@ void	*ft_malloc(size_t size)
 		return NULL;
 	max_tiny = (size_t)MAX_TINY * getpagesize();
 	max_small = (size_t)MAX_SMALL * getpagesize();
-
-	if ((void*)arena.tiny == NULL)
-		arena.tiny = get_new_arena(max_tiny);
-	if ((void*)arena.small == NULL)
-		arena.small = get_new_arena(max_small);
-	if (arena.tiny == NULL || arena.small == NULL)
-		return NULL;
 
 	if (size + sizeof(t_header) <= max_tiny)
 		return get_mallocked_zone(&arena.tiny, max_tiny, size);

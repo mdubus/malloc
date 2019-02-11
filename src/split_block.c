@@ -38,9 +38,14 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size,
 void	put_block_in_used_list(t_header *best_fit, size_t size)
 {
 	t_header	*tmp;
+	size_t		aligned_size;
 
+	aligned_size = size;
+	if (aligned_size % sizeof(long) != 0)
+		aligned_size = aligned_size + (sizeof(long) -
+		aligned_size % sizeof(long));
 	tmp = (void*)arena.used;
-	best_fit->size = size - sizeof(t_header);
+	best_fit->size = aligned_size - sizeof(t_header);
 	if (arena.used == NULL)
 	{
 		arena.used = best_fit;

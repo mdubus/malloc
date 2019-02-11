@@ -62,7 +62,6 @@ void	ft_putstr(char *str);
 /* show_alloc_mem */
 
 void	show_alloc_mem();
-void	print_padding(t_header	*list, size_t *total_padding);
 void	print_size(t_header *list);
 void	print_header(t_header *list);
 

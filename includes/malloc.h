@@ -42,6 +42,9 @@ char	*ft_strrev(char	*str);
 char	*ft_utoa_base_r(char *buf, unsigned long long n, unsigned base);
 void	print_address(uintptr_t ptr);
 
+/* get current arena */
+t_header	*get_current_arena(size_t size);
+
 /* get new arena */
 void	init_new_block(t_header *arena, size_t size);
 void	*get_new_arena(size_t size);
@@ -58,6 +61,9 @@ t_header	*search_best_fit(t_header *list, size_t size);
 /* ft_putstr */
 size_t	ft_strlen(const char *s);
 void	ft_putstr(char *str);
+
+/*get aligned size */
+size_t	get_aligned_size(size_t size);
 
 /* show_alloc_mem */
 

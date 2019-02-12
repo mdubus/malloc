@@ -20,10 +20,7 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size,
 	size_t		aligned_size;
 
 	tmp = *current_arena;
-	aligned_size = size;
-	if (aligned_size % sizeof(long) != 0)
-		aligned_size = aligned_size + (sizeof(long) -
-				aligned_size % sizeof(long));
+	aligned_size = get_aligned_size(size);
 	rest = (void*)best_fit + aligned_size;
 	rest->size = best_fit->size - aligned_size;
 	if ((*current_arena)->next == NULL)
@@ -40,12 +37,11 @@ void	put_block_in_used_list(t_header *best_fit, size_t size)
 	t_header	*tmp;
 	size_t		aligned_size;
 
-	aligned_size = size;
-	if (aligned_size % sizeof(long) != 0)
-		aligned_size = aligned_size + (sizeof(long) -
-		aligned_size % sizeof(long));
+	aligned_size = get_aligned_size(size);
 	tmp = (void*)arena.used;
-	best_fit->size = aligned_size - sizeof(t_header);
+	// S'il n'y a pas de reste dans le best_fit, alors best_fit garde sa taille
+	if (best_fit->size > aligned_size)
+		best_fit->size = aligned_size - sizeof(t_header);
 	if (arena.used == NULL)
 	{
 		arena.used = best_fit;
@@ -55,12 +51,32 @@ void	put_block_in_used_list(t_header *best_fit, size_t size)
 		put_block_in_list(&tmp, &best_fit);
 }
 
+void	remove_block_from_list(t_header **list, t_header *block)
+{
+	t_header	*tmp;
+
+	tmp = *list;
+	if (*list == block)
+		*list = block->next;
+	else
+	{
+		while (tmp != NULL && tmp->next != NULL && tmp->next != block)
+			tmp = tmp->next;
+		tmp->next = block->next;
+	}
+}
+
 void	split_block(t_header **current_arena, t_header *best_fit, size_t size)
 {
-	size_t	rest_size;
-
-	rest_size = best_fit->size - size;
-	if (rest_size > 0)
+	// Si le reste du best fit > 0, alors on rajoute le reste dans la liste des dispo
+	if (best_fit->size > get_aligned_size(size))
+	{
 		put_rest_in_free_list(best_fit, size, current_arena);
-	put_block_in_used_list(best_fit, size);
+		put_block_in_used_list(best_fit, size);
+	}
+	else
+	{
+		put_block_in_used_list(best_fit, size);
+		remove_block_from_list(current_arena, best_fit);
+	}
 }

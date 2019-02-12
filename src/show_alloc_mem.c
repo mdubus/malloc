@@ -56,6 +56,7 @@ void	show_alloc_mem(void)
 	}
 	printf("\nIn use : \x1B[35m header : %zu \x1B[0m | ", total_header);
 	printf("\x1B[36m size : %zu \x1B[0m | ", total_size);
+	printf("total : %zu", total_size + total_header);
 	fflush(stdout);
 	ft_putstr("\n\nTiny free list : \n");
 	while (arena.tiny != NULL)

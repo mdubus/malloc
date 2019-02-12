@@ -13,7 +13,8 @@ EXEC = a.out
 
 SRC_DIR = src
 SRC_FILES =	malloc.c search_best_fit.c show_alloc_mem.c print_address.c \
-			get_new_arena.c ft_putstr.c put_block_in_list.c split_block.c
+			get_new_arena.c ft_putstr.c put_block_in_list.c split_block.c \
+			get_aligned_size.c get_current_arena.c
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 

@@ -18,10 +18,7 @@ t_header	*search_best_fit(t_header *list, size_t size)
 	size_t		aligned_size;
 
 	best_ptr = NULL;
-	aligned_size = size;
-	if (aligned_size % sizeof(long) != 0)
-		aligned_size = aligned_size + (sizeof(long) -
-				aligned_size % sizeof(long));
+	aligned_size = get_aligned_size(size);
 	while (list != NULL)
 	{
 		if ((best_ptr == NULL || list->size < best_ptr->size) &&

@@ -11,3 +11,13 @@ Compile your test file. Example :
 Run :
 
 > ./env ./a.out
+
+
+## TODO :
+- free
+- calloc
+- thread safe
+- options with environment variables ?
+- show_alloc_mem like in the subjet
+- big allocations
+

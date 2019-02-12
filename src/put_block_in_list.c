@@ -14,6 +14,11 @@
 
 void	put_block_in_list(t_header **tmp, t_header **next_block)
 {
+	if (*tmp == NULL)
+	{
+		*tmp = *next_block;
+		(*tmp)->next = NULL;
+	}
 	while (*tmp && (*tmp)->next != NULL && *next_block > (*tmp)->next)
 		*tmp = (*tmp)->next;
 	if ((*tmp)->next == NULL)

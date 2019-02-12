@@ -31,7 +31,6 @@ struct s_header {
 struct s_arena {
 	t_header	*tiny;
 	t_header	*small;
-	t_header	*large;
 	t_header	*used;
 };
 
@@ -41,9 +40,6 @@ t_arena arena;
 char	*ft_strrev(char	*str);
 char	*ft_utoa_base_r(char *buf, unsigned long long n, unsigned base);
 void	print_address(uintptr_t ptr);
-
-/* get current arena */
-t_header	*get_current_arena(size_t size);
 
 /* get new arena */
 void	init_new_block(t_header *arena, size_t size);

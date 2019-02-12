@@ -16,13 +16,14 @@ void	*get_mallocked_zone(t_header **current_arena, size_t max_arena_size, size_t
 {
 	t_header	*best_fit;
 	t_header	*tmp;
+
 	best_fit = NULL;
 	tmp = NULL;
 	if (*current_arena == NULL)
-		*current_arena = get_new_arena(max_arena_size);
+		*current_arena = get_new_arena(max_arena_size + sizeof(t_header));
 	if (*current_arena == NULL)
 		return (NULL);
-	best_fit = search_best_fit(*current_arena, size + sizeof(t_header));
+	best_fit = search_best_fit(*current_arena, size);
 	if (best_fit == NULL)
 	{
 		tmp = *current_arena;
@@ -42,15 +43,25 @@ void	*ft_malloc(size_t size)
 {
 	size_t		max_tiny;
 	size_t		max_small;
+	t_header	*large;
+	t_header	*tmp;
 
-	if (size <= 0)
+	if (size + sizeof(t_header) <= sizeof(t_header))
 		return NULL;
-	max_tiny = (size_t)MAX_TINY * getpagesize();
-	max_small = (size_t)MAX_SMALL * getpagesize();
-
-	if (size + sizeof(t_header) <= max_tiny)
-		return get_mallocked_zone(&arena.tiny, max_tiny, size);
-	if (size + sizeof(t_header) <= max_small)
-		return get_mallocked_zone(&arena.small, max_small, size);
-	return (NULL);
+	max_tiny = (size_t)(MAX_TINY * getpagesize());
+	max_small = (size_t)(MAX_SMALL * getpagesize());
+	large = NULL;
+	if (size <= max_tiny)
+		return (get_mallocked_zone(&arena.tiny, max_tiny, size));
+	if (size <= max_small)
+		return (get_mallocked_zone(&arena.small, max_small, size));
+	else
+	{
+		tmp = arena.used;
+		large = get_new_arena(get_aligned_size(size + sizeof(t_header)));
+		if (large == NULL)
+			return (NULL);
+		put_block_in_list(&tmp, &large);
+		return (large + sizeof(t_header));
+	}
 }

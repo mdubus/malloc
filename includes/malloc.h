@@ -12,6 +12,10 @@
 // 2^24 / 4096 (pagesize) = 4096
 #define MAX_SMALL	4096
 
+#define TINY	0
+#define SMALL	1
+#define LARGE	2
+
 #include <stddef.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -41,6 +45,12 @@ char	*ft_strrev(char	*str);
 char	*ft_utoa_base_r(char *buf, unsigned long long n, unsigned base);
 void	print_address(uintptr_t ptr);
 
+/* get arena name */
+void	print_arena_name(size_t size);
+
+/* get arena type */
+int		get_arena_type(size_t size);
+
 /* get new arena */
 void	init_new_block(t_header *arena, size_t size);
 void	*get_new_arena(size_t size);
@@ -54,16 +64,17 @@ void	*ft_malloc(size_t size);
 
 t_header	*search_best_fit(t_header *list, size_t size);
 
-/* ft_putstr */
+/* ft_utils */
 size_t	ft_strlen(const char *s);
 void	ft_putstr(char *str);
+void	ft_putnbr(size_t size);
 
 /*get aligned size */
 size_t	get_aligned_size(size_t size);
 
-/* show_alloc_mem */
+/* my_show_alloc_mem */
 
-void	show_alloc_mem();
+void	my_show_alloc_mem();
 void	print_size(t_header *list);
 void	print_header(t_header *list);
 
@@ -75,5 +86,8 @@ void	split_block(t_header **current_arena, t_header *best_fit, size_t size);
 void	put_block_in_used_list(t_header *best_fit, size_t size);
 void	put_rest_in_free_list(t_header *best_fit, size_t size,
 		t_header **current_arena);
+
+/* show alloc mem */
+void	show_alloc_mem();
 
 #endif

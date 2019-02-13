@@ -45,17 +45,19 @@ void	*ft_malloc(size_t size)
 	size_t		max_small;
 	t_header	*large;
 	t_header	*tmp;
+	int			arena_type;
 
+	large = NULL;
+	max_tiny = (size_t)MAX_TINY * getpagesize();
+	max_small = (size_t)MAX_SMALL * getpagesize();
 	if (size + sizeof(t_header) <= sizeof(t_header))
 		return NULL;
-	max_tiny = (size_t)(MAX_TINY * getpagesize());
-	max_small = (size_t)(MAX_SMALL * getpagesize());
-	large = NULL;
-	if (size <= max_tiny)
+	arena_type = get_arena_type(size);
+	if (arena_type == TINY)
 		return (get_mallocked_zone(&arena.tiny, max_tiny, size));
-	if (size <= max_small)
+	else if (arena_type == SMALL)
 		return (get_mallocked_zone(&arena.small, max_small, size));
-	else
+	else if (arena_type == LARGE)
 	{
 		tmp = arena.used;
 		large = get_new_arena(get_aligned_size(size + sizeof(t_header)));
@@ -64,4 +66,6 @@ void	*ft_malloc(size_t size)
 		put_block_in_list(&tmp, &large);
 		return (large + sizeof(t_header));
 	}
+	else
+		return NULL;
 }

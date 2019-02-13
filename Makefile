@@ -12,9 +12,10 @@ EXEC = a.out
 ##### SOURCES #####
 
 SRC_DIR = src
-SRC_FILES =	malloc.c search_best_fit.c show_alloc_mem.c print_address.c \
-			get_new_arena.c ft_putstr.c put_block_in_list.c split_block.c \
-			get_aligned_size.c
+SRC_FILES =	malloc.c search_best_fit.c my_show_alloc_mem.c print_address.c \
+			get_new_arena.c ft_utils.c put_block_in_list.c split_block.c \
+			get_aligned_size.c show_alloc_mem.c print_arena_name.c \
+			get_arena_type.c
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 

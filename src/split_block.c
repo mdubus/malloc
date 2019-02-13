@@ -12,6 +12,15 @@
 
 #include "../includes/malloc.h"
 
+void	check_for_defragmentation(t_header **rest)
+{
+	if ((*rest)->next == *rest + sizeof(t_header) + (*rest)->size + 1)
+	{
+		(*rest)->size += (*rest)->next->size + sizeof(t_header);
+		(*rest)->next = (*rest)->next->next;
+	}
+}
+
 void	put_rest_in_free_list(t_header *best_fit, size_t size,
 		t_header **current_arena)
 {
@@ -29,7 +38,10 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size,
 		(*current_arena)->next = NULL;
 	}
 	else
+	{
 		put_block_in_list(&tmp, &rest);
+		check_for_defragmentation(&rest);
+	}
 }
 
 void	put_block_in_used_list(t_header *best_fit, size_t size)

@@ -64,6 +64,12 @@ void	*ft_malloc(size_t size);
 
 t_header	*search_best_fit(t_header *list, size_t size);
 
+/* remove block from list */
+void	remove_block_from_list(t_header **list, t_header *block);
+
+/* free */
+void	ft_free(void	*ptr);
+
 /* ft_utils */
 size_t	ft_strlen(const char *s);
 void	ft_putstr(char *str);
@@ -86,6 +92,7 @@ void	split_block(t_header **current_arena, t_header *best_fit, size_t size);
 void	put_block_in_used_list(t_header *best_fit, size_t size);
 void	put_rest_in_free_list(t_header *best_fit, size_t size,
 		t_header **current_arena);
+void	check_for_defragmentation(t_header **ptr);
 
 /* show alloc mem */
 void	show_alloc_mem();

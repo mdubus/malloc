@@ -12,12 +12,12 @@
 
 #include "../includes/malloc.h"
 
-void	check_for_defragmentation(t_header **rest)
+void	check_for_defragmentation(t_header **ptr)
 {
-	if ((*rest)->next == *rest + sizeof(t_header) + (*rest)->size + 1)
+	if (*ptr != NULL && (*ptr)->next != NULL && (*ptr)->next == (void*)(*ptr + sizeof(t_header) + (*ptr)->size))
 	{
-		(*rest)->size += (*rest)->next->size + sizeof(t_header);
-		(*rest)->next = (*rest)->next->next;
+		(*ptr)->size += (*ptr)->next->size + sizeof(t_header);
+		(*ptr)->next = (*ptr)->next->next;
 	}
 }
 
@@ -31,7 +31,7 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size,
 	tmp = *current_arena;
 	aligned_size = get_aligned_size(size);
 	rest = (void*)best_fit + aligned_size;
-	rest->size = best_fit->size - aligned_size;
+	rest->size = best_fit->size - aligned_size - sizeof(t_header);
 	if ((*current_arena)->next == NULL)
 	{
 		*current_arena = rest;
@@ -40,7 +40,7 @@ void	put_rest_in_free_list(t_header *best_fit, size_t size,
 	else
 	{
 		put_block_in_list(&tmp, &rest);
-		check_for_defragmentation(&rest);
+		//	check_for_defragmentation(&rest);
 	}
 }
 
@@ -61,21 +61,6 @@ void	put_block_in_used_list(t_header *best_fit, size_t size)
 	}
 	else
 		put_block_in_list(&tmp, &best_fit);
-}
-
-void	remove_block_from_list(t_header **list, t_header *block)
-{
-	t_header	*tmp;
-
-	tmp = *list;
-	if (*list == block)
-		*list = block->next;
-	else
-	{
-		while (tmp != NULL && tmp->next != NULL && tmp->next != block)
-			tmp = tmp->next;
-		tmp->next = block->next;
-	}
 }
 
 void	split_block(t_header **current_arena, t_header *best_fit, size_t size)

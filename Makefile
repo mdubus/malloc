@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Werror -Wextra -Wpadded -fcolor-diagnostics
+CFLAGS = -Wall -Werror -Wextra -Wpadded -fcolor-diagnostics -fsanitize=address
 #CFLAGS=
 
 ifeq ($(HOSTTYPE),)
@@ -15,7 +15,7 @@ SRC_DIR = src
 SRC_FILES =	malloc.c search_best_fit.c my_show_alloc_mem.c print_address.c \
 			get_new_arena.c ft_utils.c put_block_in_list.c split_block.c \
 			get_aligned_size.c show_alloc_mem.c print_arena_name.c \
-			get_arena_type.c
+			get_arena_type.c free.c remove_block_from_list.c
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 

@@ -14,8 +14,8 @@ Run :
 
 
 ## TODO :
-- free
 - calloc
 - thread safe
 - options with environment variables ?
+- fix bug in defragmentation with main2
 

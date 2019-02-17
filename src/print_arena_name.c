@@ -6,9 +6,9 @@ void	print_arena_name(size_t size)
 
 	type = get_arena_type(size);
 	if (type == TINY)
-		ft_putstr("TINY ");
+		ft_putstr("TINY  ");
 	else if (type == SMALL)
-		ft_putstr("SMALL");
+		ft_putstr("SMALL ");
 	else
-		ft_putstr("LARGE");
+		ft_putstr("LARGE ");
 }
